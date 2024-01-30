@@ -1,9 +1,9 @@
-import makeUserServerLib from '@/server-lib/slib.user'
+import makeBookingServerLib from '@/server-lib/slib.booking'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   let response = null
-  const service = makeUserServerLib()
+  const service = makeBookingServerLib()
 
   switch (req.method) {
     case 'GET':
