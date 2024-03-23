@@ -1,7 +1,8 @@
 import db from './db'
-import { getDocs } from 'firebase/firestore';
+import { getDocs, doc, updateDoc } from 'firebase/firestore';
 import { _requestWrapper, buildQuery } from './utils';
 import { NextApiRequest } from 'next';
+import { bookingConverter } from '@/models/booking';
 
 export default function makeBookingServerLib() {
 
@@ -11,19 +12,12 @@ export default function makeBookingServerLib() {
     return await _requestWrapper(async () => {
       const bookings: Booking[] = []
 
-      const q = buildQuery(db, 'bookings', params)
+      const q = buildQuery(db, 'bookings', params).withConverter(bookingConverter)
       const querySnapshot = await getDocs(q)
 
       querySnapshot.forEach((doc) => {
-        const data = doc.data()
-        const slot: Booking = {
-          id: doc.id,
-          student_id: data.student_id,
-          slot_id: data.slot_id,
-          booking_time: data.booking_time.toDate(),
-          is_completed: data.is_completed,
-        }
-        bookings.push(slot)
+        const data: Booking = doc.data()
+        bookings.push(data)
       })
       return bookings
     })
@@ -33,7 +27,11 @@ export default function makeBookingServerLib() {
 
   }
 
-  async function update({ }) {
-
+  async function update(id: string, req: NextApiRequest) {
+    return await _requestWrapper(async () => {
+      const updatedData: Partial<Booking> = req.body
+      const bookingRef = doc(db, 'bookings', id).withConverter(bookingConverter)
+      await updateDoc(bookingRef, updatedData)
+    })
   }
 }

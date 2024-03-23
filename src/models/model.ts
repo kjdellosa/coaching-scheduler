@@ -1,5 +1,6 @@
 import z from 'zod'
 
+// TODO: Remove?
 export class Model<T> {
   private readonly schema: z.ZodSchema<T>
   private readonly object: T
